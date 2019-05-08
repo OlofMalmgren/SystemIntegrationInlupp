@@ -3,37 +3,26 @@
 #include <ESP8266HTTPClient.h>
 #include <DHT.h>
 
-
 #define DHT_TYPE DHT11
 #define DHT_PIN 2
-
+long previousMillis = 0; 
 float temp;
 String temp_str;
 
-
 static DHT dht(DHT_PIN, DHT_TYPE);
 
+WebSocketsServer webSocket = WebSocketsServer(80);
 const char* ssid = "";
 const char* password = "";
  
-
-WebSocketsServer webSocket = WebSocketsServer(80);
+void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
  
-
-void onWebSocketEvent(uint8_t num,
-                      WStype_t type,
-                      uint8_t * payload,
-                      size_t length) {
- 
-
   switch(type) {
  
-    
     case WStype_DISCONNECTED:
       Serial.printf("[%u] Disconnected!\n", num);
       break;
  
-   
     case WStype_CONNECTED:
       {
         IPAddress ip = webSocket.remoteIP(num);
@@ -41,22 +30,12 @@ void onWebSocketEvent(uint8_t num,
         Serial.println(ip.toString());
       }
       break;
-
+ 
     case WStype_TEXT:
       
       Serial.printf("[%u] Text: %s\n", num, payload);
       temp_str = String(temp);
-      webSocket.sendTXT(0, temp_str);
-      webSocket.sendTXT(num, payload);
-      break;
- 
-    case WStype_BIN:
-    case WStype_ERROR:
-    case WStype_FRAGMENT_TEXT_START:
-    case WStype_FRAGMENT_BIN_START:
-    case WStype_FRAGMENT:
-    case WStype_FRAGMENT_FIN:
-    default:
+      webSocket.sendTXT(num, temp_str);
       break;
   }
 }
@@ -76,7 +55,6 @@ void setup() {
   Serial.print("My IP address: ");
   Serial.println(WiFi.localIP());
  
-  // Start WebSocket server and assign callback
   webSocket.begin();
   webSocket.onEvent(onWebSocketEvent);
 }
@@ -84,30 +62,33 @@ void setup() {
 void loop() {
   temp = dht.readTemperature(); 
   webSocket.loop();
-
-   if(WiFi.status()== WL_CONNECTED){
+  unsigned long currentMillis = millis();
   
-   HTTPClient http;   
-   http.begin(String("http:...")+temp); 
-   http.addHeader("Content-Type", "text/plain");             
-   int httpResponseCode = http.POST("temp");  
-    
-   if(httpResponseCode>0){
-    String response = http.getString();
-    Serial.println(httpResponseCode);
-    Serial.print(response);  
-    Serial.println(temp);
-   }else{
-    Serial.print("Error on sending POST: ");
-    Serial.println(httpResponseCode);
+  
+  if(currentMillis - previousMillis > 10000){
+        previousMillis = currentMillis;
+        if(WiFi.status()== WL_CONNECTED){
+  
+         HTTPClient http;   
+         http.begin(String("http:")+temp); 
+         http.addHeader("Content-Type", "text/plain");             
+         int httpResponseCode = http.POST("temp");  
+          
+         if(httpResponseCode>0){
+          String response = http.getString();
+          Serial.println(httpResponseCode);
+          Serial.print(response);  
+          Serial.println(temp);
+         }else{
+          Serial.print("Error on sending POST: ");
+          Serial.println(httpResponseCode);
+         }
+         http.end();
+       
+       }else{
+          Serial.println("Error in WiFi connection");   
+       }
    }
-   http.end();
- 
- }else{
-    Serial.println("Error in WiFi connection");   
- }
 
- 
-  delay(10000);
-  
+
 }
