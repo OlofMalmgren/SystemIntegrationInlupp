@@ -27,7 +27,6 @@
 
   function onOpen(evt)
   {
-    //writeToScreen("CONNECTED");
     doSend("Hej hej");
   }
 
@@ -38,9 +37,7 @@
 
   function onMessage(evt)
   {
-    //writeToScreen('<span style="color: blue;">Temperature: ' + evt.data+'</span>');
     document.getElementById("temp").innerHTML = "Temperature: " + evt.data;
-    //websocket.close();
     setTimeout(function(){ping()}, 2000);
   }
   
