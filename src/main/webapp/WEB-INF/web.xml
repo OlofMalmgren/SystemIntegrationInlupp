@@ -18,7 +18,10 @@
       </init-param> 
        <load-on-startup>1</load-on-startup>
    </servlet> 
-
+<servlet>
+        <servlet-name>ServletExtender</servlet-name>
+        <servlet-class>temperatureWebApp.ServletExtender</servlet-class>
+    </servlet>
    <servlet-mapping> 
       <servlet-name>Demo Servlet</servlet-name> 
       <url-pattern>/rest/*</url-pattern> 

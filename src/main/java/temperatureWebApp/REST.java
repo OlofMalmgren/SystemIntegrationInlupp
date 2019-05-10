@@ -19,7 +19,13 @@ public class REST
     @Produces(MediaType.TEXT_PLAIN)
     public String getTemp() throws SQLException, ClassNotFoundException, IOException
     {
-        String temps = AzureFunctions.getAllTemperatures();
-        return temps;
+        return AzureFunctions.getAllTemperatures();
+    }
+    
+    @GET
+    @Path("/newTemp/{temp}")
+    public void newTemp(@PathParam("temp") String temp) throws SQLException, ClassNotFoundException, IOException
+    {
+        AzureFunctions.insertNewTemp(temp);
     }
 }

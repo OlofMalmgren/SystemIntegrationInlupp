@@ -25,13 +25,28 @@ public class AzureFunctions
     {
         Connection con = setupADBconnection();
         Statement stmtCost = con.createStatement();
-        ResultSet rs = stmtCost.executeQuery("select * from test");
+        ResultSet rs = stmtCost.executeQuery("select * from Message");
         String allTemps = "";
         while(rs.next())
         {
-            float buff = rs.getFloat("temp");
-            allTemps += Float.toString(buff) + "\n";
+            String device = rs.getNString("Device");
+            float temp = rs.getFloat("Temperature");
+            float hum = rs.getFloat("Humidity");
+            String date = rs.getString("Created");
+            String longi = rs.getString("Longitude");
+            String lat = rs.getString("Latitude");
+            allTemps += "Decvice: " + device + " Temperature: " + temp + " Humidity: " + hum + " Date: " + date + " Longitude: " + longi + " Latitude: " + lat +"\n";
         }
         return allTemps;
     }
+    
+    public static void insertNewTemp(String newValue) throws SQLException, ClassNotFoundException
+    {
+        Connection con = setupADBconnection();
+        PreparedStatement stmt = con.prepareStatement("insert into Test(temp) values(?)");
+        stmt.setString(1, newValue);
+        stmt.executeQuery();
+    }
+    
+    
 }

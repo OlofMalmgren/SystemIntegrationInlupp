@@ -1,11 +1,93 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Azure server</title>
+    
+        <title>Azure DB</title>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>Azure server</div>
-    </body>
+        <p id="temp"></p>
+        
+        <script language="javascript" type="text/javascript">
+
+        var wsUri = "ws://172.20.200.179";
+        var output;
+    
+  function init()
+  {
+    output = document.getElementById("output");
+    testWebSocket();
+  }
+
+  function testWebSocket()
+  {
+    websocket = new WebSocket(wsUri);
+    websocket.onopen = function(evt) { onOpen(evt) };
+    websocket.onclose = function(evt) { onClose(evt) };
+    websocket.onmessage = function(evt) { onMessage(evt) };
+    websocket.onerror = function(evt) { onError(evt) };
+  }
+
+  function onOpen(evt)
+  {
+    //writeToScreen("CONNECTED");
+    doSend("Hej hej");
+  }
+
+  function onClose(evt)
+  {
+    writeToScreen("DISCONNECTED");
+  }
+
+  function onMessage(evt)
+  {
+    //writeToScreen('<span style="color: blue;">Temperature: ' + evt.data+'</span>');
+    document.getElementById("temp").innerHTML = "Temperature: " + evt.data;
+    //websocket.close();
+    setTimeout(function(){ping()}, 2000);
+  }
+  
+  function ping()
+  {
+     doSend("ping"); 
+  }
+
+  function onError(evt)
+  {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+  }
+
+  function doSend(message)
+  {
+    websocket.send(message);
+  }
+
+  function writeToScreen(message)
+  {
+    var pre = document.createElement("p");
+    pre.style.wordWrap = "break-word";
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  window.addEventListener("load", init, false);
+
+    function ReloadADB()
+    {
+        var ifr = document.getElementsByName('AzureFrame')[0];
+        ifr.src = ifr.src;
+    }
+
+
+  </script>
+ 
+  
+<iframe name="AzureFrame" src="http://localhost:8080/temperatureWebApp/rest/Azure/allTemps" width="975" height="200" align="left" frameborder="0" scrolling="auto" class="frame-area">
+</iframe>
+<button onclick="ReloadADB();">Reload Azure DB</button>
+
+  <div id="output"></div>
+
+
+
+
+</body>
+  
 </html>
