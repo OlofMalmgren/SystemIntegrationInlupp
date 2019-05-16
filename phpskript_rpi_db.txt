@@ -1,0 +1,10 @@
+    <?php
+    $link = mysqli_connect("127.0.0.1", "webuser", "password", "test");
+    $temp = $_GET['temp'];
+    if($link) {
+       $query = mysqli_query($link, "INSERT INTO `test`(`data`) VALUES ('$temp')");
+    }
+    else {
+       echo "MySQL error :".mysqli_error();
+    }
+    ?>
