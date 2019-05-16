@@ -22,7 +22,7 @@ public class Client {
            getTemperatur();
         }
         public static void sendToAzure(float temp){
-        String url = String.format("jdbc:sqlserver://sqldbbi2.database.windows.net:1433;database=systemintegration;user=olof@sqldbbi2;password=Sysinlupp2;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;");
+        String url = String.format("connectionstring");
         Connection connection = null;
         
         try {
